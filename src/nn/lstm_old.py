@@ -1,5 +1,5 @@
-from stage import *
-from func import *
+from .stage import *
+from .func import *
 
 def sliceWeights(inputDim,outputDim,W):
     s1 = inputDim + outputDim * 2 + 1

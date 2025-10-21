@@ -1,4 +1,4 @@
-from stage import *
+from .stage import *
 
 class ElementProduct(Stage):
     """Stage multiplying first half of the input with second half"""

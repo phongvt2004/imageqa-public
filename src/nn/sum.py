@@ -1,4 +1,4 @@
-from stage import *
+from .stage import *
 
 class Sum(Stage):
     """Stage summing first half of the input with second half."""
@@ -15,7 +15,7 @@ class Sum(Stage):
         return np.sum(
             X.reshape(X.shape[0],
                 self.numComponents,
-                X.shape[1] / self.numComponents),
+                X.shape[1] // self.numComponents),
             axis=1)
     def backward(self, dEdY):
         self.dEdW = 0.0

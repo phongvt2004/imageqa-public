@@ -1,9 +1,9 @@
-from sequential import *
-from lstm_old import *
-from dropout import *
-from reshape import *
-from lut import *
-from lstm import *
+from .sequential import *
+from .lstm_old import *
+from .dropout import *
+from .reshape import *
+from .lut import *
+from .lstm import *
 import unittest
 
 class LSTM_Recurrent_Real_Tests(unittest.TestCase):
@@ -148,7 +148,7 @@ class LSTM_Recurrent_Real_Tests(unittest.TestCase):
            if not ((a[i] == 0 and b[i] == 0) or
                 (np.abs(a[i]) < 1e-7 and np.abs(b[i]) < 1e-7) or
                 (np.abs(a[i] / b[i] - 1) < tolerance)):
-                    print a[i], b[i], a[i]/b[i]
+                    print(a[i], b[i], a[i]/b[i])
            self.assertTrue(
                 (a[i] == 0 and b[i] == 0) or
                 (np.abs(a[i]) < 1e-7 and np.abs(b[i]) < 1e-7) or

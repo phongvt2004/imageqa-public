@@ -98,13 +98,13 @@ def runTests(params, model, trainer):
             imageqa_test.testAll(
                 trainer.name, model, params['dataFolder'], params['outputFolder'])
         else:
-            testData = np.load(params['testDataFilename'])
+            testData = np.load(params['testDataFilename'], allow_pickle=True, encoding='latin1')
             testInput = testData[0]
             testTarget = testData[1]
-            model.loadWeights(np.load(trainer.modelFilename))
+            model.loadWeights(np.load(trainer.modelFilename, allow_pickle=True, encoding='latin1'))
             testOutput = nn.test(model, testInput)
             testRate, c, t = nn.calcRate(model, testOutput, testTarget)
-            print 'Test rate: ', testRate
+            print('Test rate: ', testRate)
             with open(os.path.join(
                 trainer.outputFolder, 'result.txt'), 'w+') as f:
                 f.write('Test rate: %f\n' % testRate)
@@ -196,15 +196,15 @@ if __name__ == '__main__':
     
     # Load train options
     with open(params['configFilename']) as f:
-        trainOpt = yaml.load(f)
+        trainOpt = yaml.load(f, Loader=yaml.FullLoader)
     
     # Load dataset
-    trainData = np.load(params['trainDataFilename'])
+    trainData = np.load(params['trainDataFilename'], allow_pickle=True, encoding='latin1')
     trainInput = trainData[0]
     trainTarget = trainData[1]
     
     if params['validDataFilename'] is not None:
-        validData = np.load(params['validDataFilename'])
+        validData = np.load(params['validDataFilename'], allow_pickle=True, encoding='latin1')
         validInput = validData[0]
         validTarget = validData[1]
     else:
@@ -212,15 +212,15 @@ if __name__ == '__main__':
         validTarget = None
 
     if params['trainInputWeightsFilename'] is not None:
-        trainInputWeights = np.load(params['trainInputWeightsFilename'])
-        validInputWeights = np.load(params['validInputWeightsFilename'])
+        trainInputWeights = np.load(params['trainInputWeightsFilename'], allow_pickle=True, encoding='latin1')
+        validInputWeights = np.load(params['validInputWeightsFilename'], allow_pickle=True, encoding='latin1')
     else:
         trainInputWeights = None
         validInputWeights = None  
 
     if params['savedModelId'] is not None:
         modelFolder = os.path.join(params['outputFolder'], params['savedModelId'])
-        initWeights = np.load(os.path.join(modelFolder, params['savedModelId'] + '.w.npy'))
+        initWeights = np.load(os.path.join(modelFolder, params['savedModelId'] + '.w.npy'), allow_pickle=True, encoding='latin1')
         if '-v-' in params['savedModelId']:
             # Train model
             model, trainer = trainValid(
@@ -236,7 +236,7 @@ if __name__ == '__main__':
 
             # Reload model
             model = nn.load(params['modelFilename'])
-            model.loadWeights(np.load(trainer.modelFilename))
+            model.loadWeights(np.load(trainer.modelFilename, allow_pickle=True, encoding='latin1'))
 
             # Run tests
             runTests(params, model, trainer)
@@ -247,7 +247,7 @@ if __name__ == '__main__':
 
                 # Setup options
                 trainOpt['needValid'] = False
-                print 'Stopped score:', trainer.stoppedTrainScore
+                print('Stopped score:', trainer.stoppedTrainScore)
                 trainOpt['stopScore'] = trainer.stoppedTrainScore
 
                 # Train train+valid
@@ -263,7 +263,7 @@ if __name__ == '__main__':
 
                 # Reload model
                 model = nn.load(params['modelFilename'])
-                model.loadWeights(np.load(trainer.modelFilename))
+                model.loadWeights(np.load(trainer.modelFilename, allow_pickle=True, encoding='latin1'))
 
                 # Run tests
                 runTests(params, model, trainer)
@@ -289,7 +289,7 @@ if __name__ == '__main__':
 
             # Reload model
             model = nn.load(params['modelFilename'])
-            model.loadWeights(np.load(trainer.modelFilename))
+            model.loadWeights(np.load(trainer.modelFilename, allow_pickle=True, encoding='latin1'))
 
             # Run tests
             runTests(params, model, trainer)
@@ -308,7 +308,7 @@ if __name__ == '__main__':
 
             # Reload model
             model = nn.load(params['modelFilename'])
-            model.loadWeights(np.load(trainer.modelFilename))
+            model.loadWeights(np.load(trainer.modelFilename, allow_pickle=True, encoding='latin1'))
 
             # Run tests
             runTests(params, model, trainer)
@@ -319,7 +319,7 @@ if __name__ == '__main__':
 
                 # Setup options
                 trainOpt['needValid'] = False
-                print 'Stopped score:', trainer.stoppedTrainScore
+                print('Stopped score:', trainer.stoppedTrainScore)
                 trainOpt['stopScore'] = trainer.stoppedTrainScore
 
                 # Train train+valid
@@ -335,7 +335,7 @@ if __name__ == '__main__':
 
                 # Reload model
                 model = nn.load(params['modelFilename'])
-                model.loadWeights(np.load(trainer.modelFilename))
+                model.loadWeights(np.load(trainer.modelFilename, allow_pickle=True, encoding='latin1'))
 
                 # Run tests
                 runTests(params, model, trainer)
@@ -357,8 +357,7 @@ if __name__ == '__main__':
 
             # Reload model
             model = nn.load(params['modelFilename'])
-            model.loadWeights(np.load(trainer.modelFilename))
+            model.loadWeights(np.load(trainer.modelFilename, allow_pickle=True, encoding='latin1'))
 
             # Run tests
             runTests(params, model, trainer)
-

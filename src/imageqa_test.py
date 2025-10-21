@@ -50,10 +50,10 @@ def calcRate(
         if answer == target[n, 0]:
             correct[typ] += 1
     rate = correct / total.astype('float')
-    print 'object: %.4f' % rate[0]
-    print 'number: %.4f' % rate[1]
-    print 'color: %.4f' % rate[2]
-    print 'location: %.4f' % rate[3]
+    print('object: %.4f' % rate[0])
+    print('number: %.4f' % rate[1])
+    print('color: %.4f' % rate[2])
+    print('location: %.4f' % rate[3])
     return correct, total
 
 def calcPrecision(
@@ -82,9 +82,9 @@ def calcPrecision(
     r1 = correctAt1 / float(modelOutput.shape[0])
     r5 = correctAt5 / float(modelOutput.shape[0])
     r10 = correctAt10 / float(modelOutput.shape[0])
-    print 'rate @ 1: %.4f' % r1
-    print 'rate @ 5: %.4f' % r5
-    print 'rate @ 10: %.4f' % r10
+    print('rate @ 1: %.4f' % r1)
+    print('rate @ 5: %.4f' % r5)
+    print('rate @ 10: %.4f' % r10)
     return (r1, r5, r10)
 
 def outputTxt(
@@ -129,9 +129,9 @@ def runWups(
     w10 = calculate_wups.runAll(truthFilename, answerFilename, -1)
     w09 = calculate_wups.runAll(truthFilename, answerFilename, 0.9)
     w00 = calculate_wups.runAll(truthFilename, answerFilename, 0.0)
-    print 'WUPS @ 1.0: %.4f' % w10
-    print 'WUPS @ 0.9: %.4f' % w09
-    print 'WUPS @ 0.0: %.4f' % w00
+    print('WUPS @ 1.0: %.4f' % w10)
+    print('WUPS @ 0.9: %.4f' % w09)
+    print('WUPS @ 0.0: %.4f' % w00)
     return (w10, w09, w00)
 
 def getAnswerFilename(
@@ -155,17 +155,17 @@ def getTruthFilename(
                     '%s.test.t.txt' % taskId)
 
 def loadDataset(dataFolder):
-    print 'Loading dataset...'
+    print('Loading dataset...')
     trainDataFile = os.path.join(dataFolder, 'train.npy')
     validDataFile = os.path.join(dataFolder, 'valid.npy')
     testDataFile = os.path.join(dataFolder, 'test.npy')
     vocabDictFile = os.path.join(dataFolder, 'vocab-dict.npy')
     qtypeFile = os.path.join(dataFolder, 'test-qtype.npy')
-    trainData = np.load(trainDataFile)
-    validData = np.load(validDataFile)
-    testData = np.load(testDataFile)
-    vocabDict = np.load(vocabDictFile)
-    qTypeArray = np.load(qtypeFile)
+    trainData = np.load(trainDataFile, allow_pickle=True, encoding='latin1')
+    validData = np.load(validDataFile, allow_pickle=True, encoding='latin1')
+    testData = np.load(testDataFile, allow_pickle=True, encoding='latin1')
+    vocabDict = np.load(vocabDictFile, allow_pickle=True, encoding='latin1')
+    qTypeArray = np.load(qtypeFile, allow_pickle=True, encoding='latin1')
     inputTest = testData[0]
     targetTest = testData[1]
     qDict = vocabDict[0]
@@ -185,11 +185,11 @@ def loadDataset(dataFolder):
 def loadModel(
                 taskId,
                 resultsFolder):
-    print 'Loading model...'
+    print('Loading model...')
     modelSpecFile = '%s/%s/%s.model.yml' % (resultsFolder, taskId, taskId)
     modelWeightsFile = '%s/%s/%s.w.npy' % (resultsFolder, taskId, taskId)
     model = nn.load(modelSpecFile)
-    model.loadWeights(np.load(modelWeightsFile))
+    model.loadWeights(np.load(modelWeightsFile, allow_pickle=True, encoding='latin1'))
     return model
 
 def testAll(
@@ -202,7 +202,7 @@ def testAll(
     data = loadDataset(dataFolder)
     outputTest = nn.test(model, data['testData'][0])
     rate, correct, total = nn.calcRate(model, outputTest, data['testData'][1])
-    print 'rate: %.4f' % rate
+    print('rate: %.4f' % rate)
     resultsRank, \
     resultsCategory, \
     resultsWups = runAllMetrics(
@@ -275,6 +275,6 @@ if __name__ == '__main__':
             dataFolder = sys.argv[i + 1]        
         elif flag == '-r' or flag == '-result':
             resultsFolder = sys.argv[i + 1]
-    print modelId
+    print(modelId)
     model = loadModel(modelId, resultsFolder)
     testAll(modelId, model, dataFolder, resultsFolder)

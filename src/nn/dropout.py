@@ -1,4 +1,4 @@
-from stage import *
+from .stage import *
 
 class Dropout(Stage):
     def __init__(self,

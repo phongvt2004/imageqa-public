@@ -1,11 +1,11 @@
-from recurrent import *
-from lstm_old import *
-import stage_tests
+from .recurrent import *
+from .lstm_old import *
+from . import stage_tests
 import unittest
-from map import *
-from active import *
-from elem_prod import *
-from sum import *
+from .map import *
+from .active import *
+from .elem_prod import *
+from .sum import *
 
 class Recurrent_Tests(stage_tests.StageTests):
     def setUp(self):
@@ -253,7 +253,7 @@ class LSTM_Recurrent_Random_Tests(unittest.TestCase):
             if not ((a[i] == 0 and b[i] == 0) or
                 (np.abs(a[i]) < 1e-8 and np.abs(b[i]) < 1e-8) or
                 (np.abs(a[i] / b[i] - 1) < tolerance)):
-                    print a[i], b[i], a[i]/b[i]
+                    print(a[i], b[i], a[i]/b[i])
             self.assertTrue(
                 (a[i] == 0 and b[i] == 0) or
                 (np.abs(a[i]) < 1e-8 and np.abs(b[i]) < 1e-8) or

@@ -1,4 +1,4 @@
-from stage import *
+from .stage import *
 
 class Normalize(Stage):
     def __init__(self,

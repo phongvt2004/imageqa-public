@@ -1,4 +1,4 @@
-from container import *
+from .container import *
 
 class Sequential(Stage):
     def __init__(self, stages, inputNames=None, name=None, outputDim=0, outputdEdX=True):

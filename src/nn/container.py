@@ -1,5 +1,5 @@
-from active_func import *
-from map import *
+from .active_func import *
+from .map import *
 
 class Input(Stage):
     def __init__(self, name, outputDim):

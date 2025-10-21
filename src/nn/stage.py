@@ -121,10 +121,10 @@ class Stage:
         """
         self.X = self.getInput()
         if verbose and hasattr(self.X, 'shape'):
-            print 'forward in', self.name, self.X.shape
+            print('forward in', self.name, self.X.shape)
         self.Y = self.forward(self.X)
         if verbose and hasattr(self.Y, 'shape'):
-            print 'forward out', self.name, self.Y.shape
+            print('forward out', self.name, self.Y.shape)
 
     def forward(self, X):
         """
@@ -140,12 +140,12 @@ class Stage:
         Backward propagates.
         """
         if verbose and hasattr(self.dEdY, 'shape'):
-            print 'backward in', self.name, self.dEdY.shape, np.mean(self.dEdY)
+            print('backward in', self.name, self.dEdY.shape, np.mean(self.dEdY))
         dEdX = self.backward(self.dEdY)
         if self.outputdEdX:
             self.sendError(dEdX)
         if verbose and hasattr(dEdX, 'shape'):
-            print 'backward out', self.name, dEdX.shape, np.mean(dEdX)
+            print('backward out', self.name, dEdX.shape, np.mean(dEdX))
 
     def backward(self, dEdY):
         """
@@ -198,14 +198,14 @@ class Stage:
         self.momentum -= self.deltaMomentum
 
         if self.gradientClip > 0.0 or self.weightClip > 0.0:
-            print 'ST: %11s ' % self.name,
+            print('ST: %11s ' % self.name, end=' ')
             if self.gradientClip > 0.0:
-                print 'GN: %8.4f ' % self.dEdWnorm,
-                print 'GC: %8.4f ' % self.gradientClip,
+                print('GN: %8.4f ' % self.dEdWnorm, end=' ')
+                print('GC: %8.4f ' % self.gradientClip, end=' ')
             if self.weightClip > 0.0:
-                print 'WN: %8.4f ' % self.Wnorm,
-                print 'WC: %8.4f ' % self.weightClip,
-            print
+                print('WN: %8.4f ' % self.Wnorm, end=' ')
+                print('WC: %8.4f ' % self.weightClip, end=' ')
+            print()
 
     def getWeights(self):
         if self.gpu:

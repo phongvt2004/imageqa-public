@@ -1,21 +1,21 @@
-from lstm_old import *
-from lstm import *
-from map import *
-from lut import *
-from inner_prod import *
-from reshape import *
-from cos_sim import *
-from sum import *
-from elem_prod import *
-from active import *
-from sum_prod import *
-from active_func import *
-from selector import *
-from conv1d import *
-from meanpool1d import *
-from maxpool1d import *
-from normalize import *
-from ordinal import *
+from .lstm_old import *
+from .lstm import *
+from .map import *
+from .lut import *
+from .inner_prod import *
+from .reshape import *
+from .cos_sim import *
+from .sum import *
+from .elem_prod import *
+from .active import *
+from .sum_prod import *
+from .active_func import *
+from .selector import *
+from .conv1d import *
+from .meanpool1d import *
+from .maxpool1d import *
+from .normalize import *
+from .ordinal import *
 
 import unittest
 import numpy as np
@@ -798,10 +798,10 @@ class OrdinalRegression_Tests(StageTests):
         random = np.random.RandomState(1)
         X = random.uniform(-1, 1, (30, 1))
         T = random.uniform(0, 5, (30, 1)).astype('int')
-        print T
+        print(T)
         dEdW, dEdWTmp, dEdX, dEdXTmp = self.calcgrd(X, T)
-        print dEdW/dEdWTmp
-        print dEdX/dEdXTmp
+        print(dEdW/dEdWTmp)
+        print(dEdX/dEdXTmp)
         self.chkgrd(dEdW, dEdWTmp)
         self.chkgrd(dEdX, dEdXTmp)
 

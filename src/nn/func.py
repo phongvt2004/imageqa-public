@@ -19,7 +19,7 @@ def sigmoidFn(X):
 
 def crossEntIdx(Y, T, weights=None):
     eps = 1e-8
-    Y2 = Y.reshape(Y.size / Y.shape[-1], Y.shape[-1])
+    Y2 = Y.reshape(Y.size // Y.shape[-1], Y.shape[-1])
     T2 = T.reshape(T.size)
     E = 0.0
     dEdY = np.zeros(Y2.shape, float)
@@ -38,7 +38,7 @@ def crossEntIdx(Y, T, weights=None):
 
 def crossEntOneIdx(Y, T, weights=None):
     eps = 1e-8
-    Y2 = Y.reshape(Y.size / Y.shape[-1], Y.shape[-1])
+    Y2 = Y.reshape(Y.size // Y.shape[-1], Y.shape[-1])
     T2 = T.reshape(T.size)
     E = 0.0
     dEdY = np.zeros(Y2.shape, float)
@@ -62,7 +62,7 @@ def crossEntOneIdx(Y, T, weights=None):
 
 def crossEntOneAccIdx(Y, T, weights=None):
     eps = 1e-8
-    Y2 = Y.reshape(Y.size / Y.shape[-1], Y.shape[-1])
+    Y2 = Y.reshape(Y.size // Y.shape[-1], Y.shape[-1])
     T2 = T.reshape(T.size)
     E = 0.0
     dEdY = np.zeros(Y2.shape, float)
@@ -105,7 +105,7 @@ def argmax(Y):
     return np.argmax(Y, axis=-1)
 
 def argmaxDiff(Y):
-    Y2 = Y.reshape(Y.size / Y.shape[-1], Y.shape[-1])
+    Y2 = Y.reshape(Y.size // Y.shape[-1], Y.shape[-1])
     Ydiff = np.zeros(Y2.shape)
     for i in range(Y2.shape[1] - 1):
         Ydiff[:, i] = Y2[:, i + 1] - Y2[:, i]

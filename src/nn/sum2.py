@@ -1,4 +1,4 @@
-from stage import *
+from .stage import *
 
 class Sum2(Stage):
     """Stage summing first half of the input with second half."""

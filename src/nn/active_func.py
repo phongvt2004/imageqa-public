@@ -1,4 +1,4 @@
-from func import *
+from .func import *
 
 class SoftmaxActiveFn():
     def __init__(self):

@@ -1,4 +1,4 @@
-from stage import *
+from .stage import *
 
 class MeanPool1D(Stage):
     """
@@ -24,7 +24,7 @@ class MeanPool1D(Stage):
         self.Y = 0
 
     def forward(self, X):
-        X = X.reshape(X.shape[0], self.windowSize, X.shape[1] / self.windowSize, X.shape[2])
+        X = X.reshape(X.shape[0], self.windowSize, X.shape[1] // self.windowSize, X.shape[2])
         Y = np.mean(X, axis=1)
         self.X = X
         return Y

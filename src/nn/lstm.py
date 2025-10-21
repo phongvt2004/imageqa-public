@@ -1,7 +1,7 @@
-from recurrent import *
-from elem_prod import *
-from sum import *
-from active import *
+from .recurrent import *
+from .elem_prod import *
+from .sum import *
+from .active import *
 
 class LSTM(RecurrentContainer):
     def __init__(self,
@@ -28,7 +28,7 @@ class LSTM(RecurrentContainer):
                  name=None):
         D2 = outputDim
         multiOutput = multiOutput
-        if name is None: print 'Warning: name is None.'
+        if name is None: print('Warning: name is None.')
         self.inputDim = inputDim
         self.outputDim = outputDim
         self.I = RecurrentAdapter(Map(

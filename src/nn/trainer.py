@@ -3,9 +3,9 @@ import sys
 import os
 import shutil
 import matplotlib
-import valid_tool as vt
-import tester
-from func import *
+from . import valid_tool as vt
+from . import tester
+from .func import *
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 plt.ion()
@@ -40,7 +40,7 @@ class Logger:
             self.outFilename = filename
 
     def logMsg(self, msg):
-        print msg
+        print(msg)
 
     def logTrainStats(self):
         timeElapsed = time.time() - self.startTime
@@ -51,7 +51,7 @@ class Logger:
                  self.trainer.rate[self.trainer.totalStep],
                  self.trainer.validLoss[self.trainer.totalStep],
                  self.trainer.validRate[self.trainer.totalStep])
-        print stats
+        print(stats)
 
         if self.saveCsv:
             statsCsv = '%d,%.4f,%.4f,%.4f,%.4f' % \
@@ -180,24 +180,24 @@ class Trainer:
             VX = validInput
             VT = validTarget
         N = X.shape[0]
-        print 'Epoch size:', N
+        print('Epoch size:', N)
         numEpoch = trainOpt['numEpoch']
         calcError = trainOpt['calcError']
         numExPerBat = trainOpt['batchSize']
-        print 'Batch size:', numExPerBat
+        print('Batch size:', numExPerBat)
         numBatPerStep = trainOpt['stepSize'] \
-            if trainOpt.has_key('stepSize') \
+            if 'stepSize' in trainOpt \
             else int(np.ceil(N / float(numExPerBat)))
-        print 'Step size:', numBatPerStep
+        print('Step size:', numBatPerStep)
         numExPerStep = numExPerBat * numBatPerStep \
-            if trainOpt.has_key('stepSize') \
+            if 'stepSize' in trainOpt \
             else N
-        print 'Examples per step:', numExPerStep
+        print('Examples per step:', numExPerStep)
         numStepPerEpoch = int(np.ceil(
             N / float(numExPerStep))) \
-            if trainOpt.has_key('stepSize') \
+            if 'stepSize' in trainOpt \
             else 1
-        print 'Steps per epoch:', numStepPerEpoch
+        print('Steps per epoch:', numStepPerEpoch)
         progressWriter = ProgressWriter(numExPerStep, width=80)
         logger = Logger(self, csv=trainOpt['writeRecord'])
         logger.logMsg('Trainer ' + self.name)
@@ -284,7 +284,7 @@ class Trainer:
                 self.loss[totalStep] = E
                 
                 # Early stop
-                if not trainOpt.has_key('criterion'):
+                if 'criterion' not in trainOpt:
                     Tscore = E
                 else:
                     if trainOpt['criterion'] == 'loss':
@@ -307,7 +307,7 @@ class Trainer:
                         self.validRate[totalStep] = Vrate
                     
                     # Check stopping criterion
-                    if not trainOpt.has_key('criterion'):
+                    if 'criterion' not in trainOpt:
                         Vscore = VE
                     else:
                         if trainOpt['criterion'] == 'loss':
@@ -331,23 +331,23 @@ class Trainer:
                         nAfterBest += 1
                         # Stop training if above patience level
                         if nAfterBest > trainOpt['patience']:
-                            print 'Patience level reached, early stop.'
-                            print 'Will stop at score ', bestTscore
+                            print('Patience level reached, early stop.')
+                            print('Will stop at score ', bestTscore)
                             stop = True
                 else:
                     if trainOpt['saveModel']:
                         self.save()
-                    if trainOpt.has_key('stopScore') and \
+                    if 'stopScore' in trainOpt and \
                         Tscore < trainOpt['stopScore']:
-                        print \
+                        print(
                             'Training score is lower than %.4f , ealy stop.' % \
-                            trainOpt['stopScore'] 
+                            trainOpt['stopScore']) 
                         stop = True
                 
                 logger.logTrainStats()
                 if trainOpt['needValid']:
-                    print 'P: %d' % nAfterBest,
-                print self.name
+                    print('P: %d' % nAfterBest, end=' ')
+                print(self.name)
                 
                 if stop:
                     break
@@ -355,8 +355,8 @@ class Trainer:
             # Store train statistics
             if calcError:
                 epochRate = epochCorrect / float(epochTotal)
-            print 'Epoch Final: %d TE: %.4f TR:%.4f' % \
-                (epoch, epochE, epochRate)
+            print('Epoch Final: %d TE: %.4f TR:%.4f' % \
+                (epoch, epochE, epochRate))
             
             # Anneal learning rate
             self.model.updateLearningParams(epoch)
@@ -378,5 +378,5 @@ class Trainer:
         try:
             np.save(filename, self.model.getWeights())
         except Exception:
-            print 'Exception occurred. Cannot save weights'
+            print('Exception occurred. Cannot save weights')
 

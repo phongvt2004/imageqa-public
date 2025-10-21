@@ -1,6 +1,6 @@
 import yaml
-import router
-from model import *
+from . import router
+from .model import *
 
 def load(modelSpecFilename):
     """
@@ -13,7 +13,7 @@ def load(modelSpecFilename):
     :return:
     """
     with open(modelSpecFilename) as f:
-        modelDict = yaml.load(f)
+        modelDict = yaml.load(f, Loader=yaml.FullLoader)
 
     for stageDict in modelDict['specs']:
         router.addStage(stageDict)
@@ -23,7 +23,7 @@ def load(modelSpecFilename):
         modelStages.append(router.routeStage(s))
     costFn=router.routeFn(modelDict['costFn'])
 
-    if modelDict.has_key('decisionFn'):
+    if 'decisionFn' in modelDict:
         decisionFn = router.routeFn(modelDict['decisionFn'])
     else:
         decisionFn = None
@@ -31,7 +31,7 @@ def load(modelSpecFilename):
     for i in range(len(outputList)):
         outputList[i] = outputList[i].strip()
     model = GraphModel(
-        name=modelDict['name'] if modelDict.has_key('name') else None,
+        name=modelDict['name'] if 'name' in modelDict else None,
         stages=modelStages,
         outputStageNames=outputList,
         costFn=costFn,

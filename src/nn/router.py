@@ -1,21 +1,21 @@
-from lstm_old import *
-from lut import *
-from reshape import *
-from inner_prod import *
-from dropout import *
-from sequential import *
-from const_weights import *
-from const_value import *
-from cos_sim import *
-from lstm import *
-from sum_prod import *
-from selector import *
-from sum2 import *
-from conv1d import *
-from maxpool1d import *
-from meanpool1d import *
-from normalize import *
-from ordinal import *
+from .lstm_old import *
+from .lut import *
+from .reshape import *
+from .inner_prod import *
+from .dropout import *
+from .sequential import *
+from .const_weights import *
+from .const_value import *
+from .cos_sim import *
+from .lstm import *
+from .sum_prod import *
+from .selector import *
+from .sum2 import *
+from .conv1d import *
+from .maxpool1d import *
+from .meanpool1d import *
+from .normalize import *
+from .ordinal import *
 
 from scipy import sparse
 
@@ -67,19 +67,19 @@ def routeStage(name):
 def addStage(stageDict):
     stage = None
     initSeed=stageDict['initSeed']\
-    if stageDict.has_key('initSeed') else 0
+    if 'initSeed' in stageDict else 0
     initRange=stageDict['initRange']\
-    if stageDict.has_key('initRange') else 1.0
+    if 'initRange' in stageDict else 1.0
     
-    if stageDict.has_key('initWeights'):
-        print 'Initializing weights for', stageDict['name']
-        print 'Reading', stageDict['initWeights']
-        if stageDict.has_key('format'):
+    if 'initWeights' in stageDict:
+        print('Initializing weights for', stageDict['name'])
+        print('Reading', stageDict['initWeights'])
+        if 'format' in stageDict:
             if stageDict['format'] == 'plain':
                 initWeights = np.loadtxt(stageDict['initWeights'])
             elif stageDict['format'] == 'h5':
                 initWeightsFile = h5py.File(stageDict['initWeights'])
-                if stageDict.has_key('sparse') and stageDict['sparse']:
+                if 'sparse' in stageDict and stageDict['sparse']:
                     key = stageDict['h5key']
                     iwShape = initWeightsFile[key + '_shape'][:]
                     iwData = initWeightsFile[key + '_data'][:]
@@ -89,9 +89,9 @@ def addStage(stageDict):
                         (iwData, iwInd, iwPtr), shape=iwShape)
                 else:
                     initWeights = initWeightsFile[stageDict['h5key']][:]
-                print initWeights.shape
+                print(initWeights.shape)
             elif stageDict['format'] == 'numpy':
-                initWeights = np.load(stageDict['initWeights'])
+                initWeights = np.load(stageDict['initWeights'], allow_pickle=True, encoding='latin1')
             else:
                 raise Exception(
                     'Unknown weight matrix format: %s' % stageDict['format'])
@@ -101,28 +101,28 @@ def addStage(stageDict):
         initWeights = 0
     
     needInit=False\
-    if stageDict.has_key('initWeights') else True    
+    if 'initWeights' in stageDict else True    
     biasInitConst=stageDict['biasInitConst']\
-    if stageDict.has_key('biasInitConst') else -1.0
+    if 'biasInitConst' in stageDict else -1.0
     learningRate=stageDict['learningRate']\
-    if stageDict.has_key('learningRate') else 0.0
+    if 'learningRate' in stageDict else 0.0
     learningRateAnnealConst=stageDict['learningRateAnnealConst']\
-    if stageDict.has_key('learningRatennealConst') else 0.0
+    if 'learningRatennealConst' in stageDict else 0.0
     momentum=stageDict['momentum']\
-    if stageDict.has_key('momentum') else 0.0
+    if 'momentum' in stageDict else 0.0
     deltaMomentum=stageDict['deltaMomentum']\
-    if stageDict.has_key('deltaMomentum') else 0.0
+    if 'deltaMomentum' in stageDict else 0.0
     gradientClip=stageDict['gradientClip']\
-    if stageDict.has_key('gradientClip') else 0.0
+    if 'gradientClip' in stageDict else 0.0
     weightClip=stageDict['weightClip']\
-    if stageDict.has_key('weightClip') else 0.0
+    if 'weightClip' in stageDict else 0.0
     weightRegConst=stageDict['weightRegConst']\
-    if stageDict.has_key('weightRegConst') else 0.0
+    if 'weightRegConst' in stageDict else 0.0
     outputdEdX=stageDict['outputdEdX']\
-    if stageDict.has_key('outputdEdX') else True
+    if 'outputdEdX' in stageDict else True
     defaultValue=(np.zeros(stageDict['outputDim']) + stageDict['defaultValue'])\
-    if stageDict.has_key('defaultValue') else 0.0
-    if stageDict.has_key('inputs'):
+    if 'defaultValue' in stageDict else 0.0
+    if 'inputs' in stageDict:
         inputList = stageDict['inputs'].split(',')
         for i in range(len(inputList)):
             inputList[i] = inputList[i].strip()
@@ -162,9 +162,9 @@ def addStage(stageDict):
             initRange=initRange,
             initWeights=initWeights,
             needInit=needInit,
-            multiInput=stageDict['multiInput'] if stageDict.has_key('multiInput') else True,
-            multiOutput=stageDict['multiErr'] if stageDict.has_key('multiErr') else stageDict['multiOutput'],
-            cutOffZeroEnd=stageDict['cutOffZeroEnd'] if stageDict.has_key('cutOffZeroEnd') else True,
+            multiInput=stageDict['multiInput'] if 'multiInput' in stageDict else True,
+            multiOutput=stageDict['multiErr'] if 'multiErr' in stageDict else stageDict['multiOutput'],
+            cutOffZeroEnd=stageDict['cutOffZeroEnd'] if 'cutOffZeroEnd' in stageDict else True,
             learningRate=learningRate,
             learningRateAnnealConst=learningRateAnnealConst,
             momentum=momentum,
@@ -181,14 +181,14 @@ def addStage(stageDict):
             outputDim=stageDict['outputDim'],
             inputNames=inputList,
             lazyInit=stageDict['lazyInit'] if \
-            stageDict.has_key('lazyInit') else True,
+            'lazyInit' in stageDict else True,
             initSeed=initSeed,
             initRange=initRange,
             initWeights=initWeights,
             intConversion=stageDict['intConversion'] if \
-            stageDict.has_key('intConversion') else False,
+            'intConversion' in stageDict else False,
             sparse=stageDict['sparse'] == True if \
-            stageDict.has_key('sparse') else False,
+            'sparse' in stageDict else False,
             needInit=needInit,
             learningRate=learningRate,
             learningRateAnnealConst=learningRateAnnealConst,
@@ -197,7 +197,7 @@ def addStage(stageDict):
             gradientClip=gradientClip,
             weightClip=weightClip,
             weightRegConst=weightRegConst,
-            outputdEdX=stageDict['outputdEdX'] if stageDict.has_key('outputdEdX') else False
+            outputdEdX=stageDict['outputdEdX'] if 'outputdEdX' in stageDict else False
         )
     elif stageDict['type'] == 'map':
         stage = Map(
@@ -208,8 +208,8 @@ def addStage(stageDict):
             initSeed=initSeed,
             initRange=initRange,
             initWeights=initWeights,
-            initType=stageDict['initType'] if stageDict.has_key('initType') else 'zeroMean',
-            bias=stageDict['bias'] if stageDict.has_key('bias') else True,
+            initType=stageDict['initType'] if 'initType' in stageDict else 'zeroMean',
+            bias=stageDict['bias'] if 'bias' in stageDict else True,
             biasInitConst=biasInitConst,
             needInit=needInit,
             learningRate=learningRate,
@@ -334,7 +334,7 @@ def addStage(stageDict):
         stage = Selector(
             name=stageDict['name'],
             inputNames=inputList,
-            axis=stageDict['axis'] if stageDict.has_key('axis') else -1,
+            axis=stageDict['axis'] if 'axis' in stageDict else -1,
             start=stageDict['start'],
             end=stageDict['end']
         )
@@ -373,7 +373,7 @@ def addStage(stageDict):
             name=stageDict['name'],
             inputNames=inputList,
             sumAxis=stageDict['sumAxis'],
-            beta=stageDict['beta'] if stageDict.has_key('beta') else 1.0,
+            beta=stageDict['beta'] if 'beta' in stageDict else 1.0,
             outputDim=stageDict['outputDim']
         )
     elif stageDict['type'] == 'recurrent':
@@ -391,9 +391,9 @@ def addStage(stageDict):
             inputNames=inputList,
             timespan=stageDict['timespan'],
             stages=realStages,
-            multiInput=stageDict['multiInput'] if stageDict.has_key('multiInput') else True,
+            multiInput=stageDict['multiInput'] if 'multiInput' in stageDict else True,
             multiOutput=stageDict['multiOutput'],
-            cutOffZeroEnd=stageDict['cutOffZeroEnd'] if stageDict.has_key('cutOffZeroEnd') else True,
+            cutOffZeroEnd=stageDict['cutOffZeroEnd'] if 'cutOffZeroEnd' in stageDict else True,
             outputStageNames=outputList,
             outputdEdX=outputdEdX
         )
@@ -446,12 +446,12 @@ def addStage(stageDict):
             outputdEdX=outputdEdX
         )
     elif stageDict['type'] == 'normalize':
-        if stageDict.has_key('format') and stageDict['format'] == 'h5':
+        if 'format' in stageDict and stageDict['format'] == 'h5':
             mean = h5py.File(stageDict['mean'])[stageDict['meanKey']][:]
             std = h5py.File(stageDict['std'])[stageDict['stdKey']][:]
         else:
-            mean = np.load(stageDict['mean'])
-            std = np.load(stageDict['std'])
+            mean = np.load(stageDict['mean'], allow_pickle=True, encoding='latin1')
+            std = np.load(stageDict['std'], allow_pickle=True, encoding='latin1')
         stage = Normalize(
             name=stageDict['name'],
             inputNames=inputList,
@@ -466,7 +466,7 @@ def addStage(stageDict):
             inputNames=inputList,
             outputDim=stageDict['outputDim'],
             fixExtreme=stageDict['fixExtreme'] \
-            if stageDict.has_key('fixExtreme') \
+            if 'fixExtreme' in stageDict \
             else True,
             learningRate=learningRate,
             learningRateAnnealConst=learningRateAnnealConst,
@@ -480,7 +480,7 @@ def addStage(stageDict):
     else:
         raise Exception('Stage type ' + stageDict['type'] + ' not found.')
 
-    if stageDict.has_key('recurrent') and stageDict['recurrent']:
+    if 'recurrent' in stageDict and stageDict['recurrent']:
         stage = RecurrentAdapter(stage)
     stageLib[stageDict['name']] = stage
     return stage

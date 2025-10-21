@@ -36,14 +36,14 @@ def dirac_measure(a, b):
 
 
 def wup_measure(a, b, similarity_threshold = 0.925, debug = False):
-    """
+    r"""
     Returns Wu-Palmer similarity score.
     More specifically, it computes:
         max_{x \in interp(a)} max_{y \in interp(b)} wup(x,y)
         where interp is a 'interpretation field'
     """
-    if debug: print 'Original', a, b
-    if word_pair_dict.has_key(a+','+b):
+    if debug: print('Original', a, b)
+    if a+','+b in word_pair_dict:
         return  word_pair_dict[a+','+b]
 
     def get_semantic_field(a):
@@ -58,15 +58,15 @@ def wup_measure(a, b, similarity_threshold = 0.925, debug = False):
     if interp_a == [] or interp_b == []:
         return 0.0
 
-    if debug: print 'Stem', a, b
+    if debug: print('Stem', a, b)
     global_max=0.0
     for x in interp_a:
         for y in interp_b:
             local_score=x.wup_similarity(y)
-            if debug: print 'Local', local_score
+            if debug: print('Local', local_score)
             if local_score > global_max:
                 global_max=local_score
-    if debug: print 'Global', global_max
+    if debug: print('Global', global_max)
 
     # we need to use the semantic fields and therefore we downweight
     # unless the score is high which indicates both are synonyms
@@ -91,21 +91,21 @@ def runAll(gt_filepath, pred_filepath, thresh):
         measure = lambda x, y: wup_measure(x, y, thresh)
 
     if thresh == -1:
-        print 'standard Accuracy is used'
+        print('standard Accuracy is used')
     else:
-        print 'soft WUPS is used'
+        print('soft WUPS is used')
     score_list = [measure(ta, pa) for (ta, pa) in zip(input_gt, input_pred)]
     final_score = sum(map(
         lambda x: float(x) / float(len(score_list)), score_list))
 
-    print 'final score:', final_score
+    print('final score:', final_score)
     return final_score
 
 
 if __name__ == '__main__':
     if len(sys.argv) < 4:
-        print 'Usage: true answers file, predicted answers file, threshold'
-        print 'If threshold is -1, then the standard Accuracy is used'
+        print('Usage: true answers file, predicted answers file, threshold')
+        print('If threshold is -1, then the standard Accuracy is used')
         sys.exit("3 arguments must be given")
     gt_filepath=sys.argv[1]
     pred_filepath=sys.argv[2]

@@ -1,4 +1,4 @@
-from container import *
+from .container import *
 
 class GraphModel(Container):
     def __init__(self,

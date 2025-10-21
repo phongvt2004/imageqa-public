@@ -1,4 +1,4 @@
-from stage import *
+from .stage import *
 import os
 use_gpu = os.environ.get('GNUMPY_USE_GPU', 'yes') == 'yes'
 

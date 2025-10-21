@@ -1,4 +1,4 @@
-from stage import *
+from .stage import *
 import numpy as np
 
 
@@ -78,11 +78,11 @@ class OrdinalRegression(Stage):
 
     def updateLearningParams(self, numEpoch):
         Stage.updateLearningParams(self, numEpoch)
-        print 'mu:',
+        print('mu:', end=' ')
         for i in range(self.W.shape[-1]):
-            print '%.3f' % self.W[0, i],
-        print 'pi:',
+            print('%.3f' % self.W[0, i], end=' ')
+        print('pi:', end=' ')
         for i in range(self.W.shape[-1]):
-            print '%.3f' % self.W[1, i],
-        print
+            print('%.3f' % self.W[1, i], end=' ')
+        print()
 

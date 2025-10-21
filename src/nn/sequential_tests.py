@@ -1,10 +1,10 @@
-from sequential import *
-from lstm_old import *
-from map import *
-from dropout import *
-from reshape import *
-from lut import *
-from active_func import *
+from .sequential import *
+from .lstm_old import *
+from .map import *
+from .dropout import *
+from .reshape import *
+from .lut import *
+from .active_func import *
 import unittest
 
 class Sequential_Tests(unittest.TestCase):

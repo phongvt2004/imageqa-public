@@ -1,6 +1,6 @@
 import os
 verbose = os.environ.get('VERBOSE', 'no') == 'yes'
-from container import *
+from .container import *
 
 class RecurrentStage:
     def __init__(self):
@@ -91,7 +91,7 @@ class AttentionPenalty(RecurrentStage):
             self.dEdX = self.errorConst * (s - one)
         self.inputs[time].dEdY += self.dEdX
         if verbose:
-            print 'backward out', self.name, self.dEdX.shape, np.mean(self.dEdX)
+            print('backward out', self.name, self.dEdX.shape, np.mean(self.dEdX))
         
     def getStage(self, time):
         return self
