@@ -12,10 +12,10 @@ class ElementProduct(Stage):
             defaultValue=defaultValue)
     def forward(self, X):
         self.X = X
-        return X[:,:X.shape[1]/2] * X[:,X.shape[1]/2:]
+        return X[:,:X.shape[1]//2] * X[:,X.shape[1]//2:]
     def backward(self, dEdY):
         self.dEdW = 0.0
         return np.concatenate(
-            (self.X[:,self.X.shape[1]/2:] * dEdY,
-            self.X[:,:self.X.shape[1]/2] * dEdY),
+            (self.X[:,self.X.shape[1]//2:] * dEdY,
+            self.X[:,:self.X.shape[1]//2] * dEdY),
             axis=-1)
