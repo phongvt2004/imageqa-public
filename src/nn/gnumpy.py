@@ -43,7 +43,7 @@ If you really want to know how gnumpy works internally, or if you want to extend
 
 # ------------------------------------------------------------------------------- module init & shutdown
 
-import numpy, operator, sys as _sys, types as types, time as _time, os as _os, __builtin__, collections as _collections, pdb as _pdb, gc as _gc, ctypes as _ctypes, weakref as _weakref
+import numpy, operator, sys as _sys, types as types, time as _time, os as _os, builtins as __builtin__, collections as _collections, pdb as _pdb, gc as _gc, ctypes as _ctypes, weakref as _weakref
 
 _useGpu = _os.environ.get('GNUMPY_USE_GPU', 'auto')
 assert _useGpu in ('auto', 'yes', 'no'), "environment variable GNUMPY_USE_GPU, if present, should be one of 'auto', 'yes', 'no'."
@@ -53,7 +53,7 @@ if _useGpu == 'auto':
 if _useGpu == 'yes':
  import cudamat as _cudamat
 elif _useGpu == 'no':
- #import npmat as _cudamat
+ import npmat as _cudamat
  _precision = _os.environ.get('GNUMPY_CPU_PRECISION', '32')
  assert _precision in ('32', '64', '128'), 'environment variable GNUMPY_CPU_PRECISION, if present, should have value 32, 64, or 128.'
  _cudamat.__DTYPE__ = eval('numpy.float'+_precision)
@@ -135,8 +135,8 @@ def _deleteT2(tup, index):
  index %= len(tup)
  return tup[:index] + tup[index+1:]
 
-_intTypes = set((types.IntType, types.LongType, numpy.int16, numpy.int32, numpy.int8, numpy.int64))
-_floatTypes = set((types.FloatType, numpy.float64, numpy.float32, getattr(numpy, 'float128', numpy.float64), getattr(numpy, 'float96', numpy.float64))) # considering numpy.float64 a number is debatable. it really is a numpy object, and behaves that way, too: it has a __mul__ which prevents garray.__rmul__ from getting the task. However, for most purposes it's a number.
+_intTypes = set((int, numpy.int16, numpy.int32, numpy.int8, numpy.int64))
+_floatTypes = set((float, numpy.float64, numpy.float32, getattr(numpy, 'float128', numpy.float64), getattr(numpy, 'float96', numpy.float64))) # considering numpy.float64 a number is debatable. it really is a numpy object, and behaves that way, too: it has a __mul__ which prevents garray.__rmul__ from getting the task. However, for most purposes it's a number.
 _numberTypes = _intTypes | _floatTypes
  
 def _allTheSame(tup):
