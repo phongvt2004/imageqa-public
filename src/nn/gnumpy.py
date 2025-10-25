@@ -49,7 +49,7 @@ _useGpu = _os.environ.get('GNUMPY_USE_GPU', 'auto')
 assert _useGpu in ('auto', 'yes', 'no'), "environment variable GNUMPY_USE_GPU, if present, should be one of 'auto', 'yes', 'no'."
 if _useGpu == 'auto':
  try: import cudamat as _cudamat; _useGpu = 'yes'
- except: print 'gnumpy: failed to import cudamat. Using npmat instead. No GPU will be used.'; _useGpu = 'no'
+ except: print('gnumpy: failed to import cudamat. Using npmat instead. No GPU will be used.'); _useGpu = 'no'
 if _useGpu == 'yes':
  import cudamat as _cudamat
 elif _useGpu == 'no':
@@ -68,7 +68,7 @@ def board_id_to_use():
   return gpu_lock.obtain_lock_id()
  except:
   board_id = int(_os.environ.get('GNUMPY_BOARD_ID', 0))
-  print 'gnumpy: using board %d.' % board_id
+  print('gnumpy: using board %d.' % board_id)
   return board_id
  
 class GnumpyGpuUnavailableException(Exception): pass
@@ -275,7 +275,7 @@ def _calling_line():
 def memory_allocators(minimum_n_bytes=1, new_style=False):
  """ Prints a list of lines in your code that allocated GPU memory that's still in use. """
  if not track_memory_usage:
-  print 'The variable gnumpy.track_memory_usage must be set to True, to enable memory data collection (which can slow down your program a lot).'
+  print('The variable gnumpy.track_memory_usage must be set to True, to enable memory data collection (which can slow down your program a lot).')
   return
  if new_style:
   sigs = _collections.defaultdict(int) # dict of t2(line; n bytes) to total n bytes
@@ -284,23 +284,23 @@ def memory_allocators(minimum_n_bytes=1, new_style=False):
    sigs[k] += a.nbytes
   for (line, nb_each), nb_total in sorted(sigs.items(), key = lambda x: x[1])[::-1]:
    if nb_total < minimum_n_bytes: continue
-   print '%d objects of %s (total %s), that are still in use, were allocated by: \n%s\n' % (nb_total/nb_each, _n_bytes_str(nb_each), _n_bytes_str(nb_total), line)
+   print('%d objects of %s (total %s), that are still in use, were allocated by: \n%s\n' % (nb_total//nb_each, _n_bytes_str(nb_each), _n_bytes_str(nb_total), line))
  else:
   for line, (n,amt) in sorted(_memoryUsers.items(), key=lambda x:x[1][1]) [::-1] : # this is the version that doesn't explicitly track arrays
    if amt >= minimum_n_bytes:
-    print '%d objects, totalling %s, that are still in use, were allocated by: %s' % (n, _n_bytes_str(amt), line)
-    print
+     print('%d objects, totalling %s, that are still in use, were allocated by: %s' % (n, _n_bytes_str(amt), line))
+     print()
  
 
 
 # ------------------------------------------------------------------------------- external procs
 
 def status():
- if not usingGpu(): print 'gnumpy is running on the CPU, i.e. in simulation mode. The data type is float%s.' % _precision
+ if not usingGpu(): print('gnumpy is running on the CPU, i.e. in simulation mode. The data type is float%s.' % _precision)
  if usingGpu():
-  if _boardId==None: print 'gnumpy is planning to run on a GPU, but hasn\'t yet chosen & initialized a board.'
-  else: print 'gnumpy is running on GPU board #%d.' % _boardId
- print '%s of gpu memory are in use, of which at least %s can be freed immediately by gnumpy.free_reuse_cache().' % (_n_bytes_str(__memoryInUse), _n_bytes_str(__builtin__.sum( size*len(cms)*4 for size, cms in _cmsForReuse.items())))
+  if _boardId==None: print('gnumpy is planning to run on a GPU, but hasn\'t yet chosen & initialized a board.')
+  else: print('gnumpy is running on GPU board #%d.' % _boardId)
+ print('%s of gpu memory are in use, of which at least %s can be freed immediately by gnumpy.free_reuse_cache().' % (_n_bytes_str(__memoryInUse), _n_bytes_str(__builtin__.sum( size*len(cms)*4 for size, cms in _cmsForReuse.items()))))
  
  
   
@@ -1138,14 +1138,14 @@ class garray(object):
   _envInstruction = _os.environ.get('GNUMPY_IMPLICIT_CONVERSION', 'refuse')
   assert _envInstruction in ('allow', 'warn', 'refuse'), "environment variable GNUMPY_IMPLICIT_CONVERSION, if present, should be one of 'allow', 'warn', 'refuse'."
   if _envInstruction=='refuse': raise TypeError("garray objects cannot be quietly converted to numpy arrays, because the environment variable GNUMPY_IMPLICIT_CONVERSION is set to 'refuse', or is not set at all (the default is 'refuse'). Set that variable to 'allow' or 'warn' if you wish to allow quiet conversion. garray's can always be explicitly converted using the .as_numpy_array() method.")
-  if _envInstruction=='warn': print "gnumpy: warning: a garray object is being quietly converted to a numpy array, and the environment variable GNUMPY_IMPLICIT_CONVERSION is set to 'warn'. garray objects can be explicitly converted using the .as_numpy_array() method."
+  if _envInstruction=='warn': print("gnumpy: warning: a garray object is being quietly converted to a numpy array, and the environment variable GNUMPY_IMPLICIT_CONVERSION is set to 'warn'. garray objects can be explicitly converted using the .as_numpy_array() method.")
   return self.as_numpy_array().__array__(*dtype)
   
  def __repr__(self): return self.as_numpy_array().__repr__().replace('array(', 'garray(').replace('\n', '\n ').replace(', dtype=float32', '').replace(', dtype=float64', '') # 64 happens for empty arrays
   
  def __del__(self):
   if not hasattr(self, '_is_alias_of'):
-   if _isTijmen: print 'gnumpy cleaning up an unfinished garray. mem counting may be off now.'
+   if _isTijmen: print('gnumpy cleaning up an unfinished garray. mem counting may be off now.')
    return # this object was never finished, because an exception (error or interrupt) occurred in the constructor. This check avoids error messages.
   if self._is_alias_of is None:
    # this is not true in one case: if a reference to self._base is stored somewhere explicitly (somewhere outside self but not in another garray). This happens internally sometimes. I saw it happening on the last line of setitem: a transpose is created (transposes own their mem, are not aliases), and then it's dropped but _base (obtained by _base_as_row) is still in use for a cm assign call. assert _sys.getrefcount(self._base)==2, _sys.getrefcount(self._base)
