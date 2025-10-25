@@ -2,8 +2,12 @@ from .stage import *
 #use_gpu = os.environ.get('GNUMPY_USE_GPU', 'yes') == 'yes'
 use_gpu = False
 if use_gpu:
-    import gnumpy as gpu
-    import gnumpy as gnp
+    try:
+        import gnumpy as gpu
+        import gnumpy as gnp
+    except (ImportError, SyntaxError):
+        print('Warning: gnumpy not available or incompatible. Disabling GPU.')
+        use_gpu = False
 
 class SumProduct(Stage):
     def __init__(self, 

@@ -4,7 +4,11 @@ import os
 use_gpu = os.environ.get('GNUMPY_USE_GPU', 'yes') == 'yes'
 verbose = os.environ.get('VERBOSE', 'no') == 'yes'
 if use_gpu:
-    import gnumpy as gpu
+    try:
+        import gnumpy as gpu
+    except (ImportError, SyntaxError):
+        print('Warning: gnumpy not available or incompatible. Disabling GPU.')
+        use_gpu = False
 
 class Stage:
     def __init__(self,
