@@ -232,7 +232,7 @@ def _new_cm(sizeOrShape):
   ret = _cudamat.empty((size, 1))
   __memoryInUse += size*4 # do this only if the malloc succeeded
   return ret
- except _cudamat.CUDAMatException, e: # this means that malloc failed
+ except _cudamat.CUDAMatException as e: # this means that malloc failed
   raise MemoryError('The GPU failed to allocate the requested %d bytes of memory. This doesn\'t mean that your program is using too much memory. It does, however, mean that you should reduce the value of gnumpy.max_memory_usage (currently %s), to always have some memory unused (which is necessary to find contiguous large blocks of memory to allocate). Failing to allocate enough memory makes the GPU feel very unwell, so you are advised to restart Python now, or expect to see incoherent error messages and risk causing more serious damage.' % (size*4, str(max_memory_usage)))
 
 def free_reuse_cache(completely=True):
