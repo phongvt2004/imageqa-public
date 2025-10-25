@@ -1,8 +1,8 @@
 import os
 use_gpu = os.environ.get('GNUMPY_USE_GPU', 'yes') == 'yes'
 if use_gpu:
-    import gnumpy as gpu
-    import gnumpy as gnp
+    from . import gnumpy as gpu
+    from . import gnumpy as gnp
 from .stage import *
 
 class Conv1D(Stage):

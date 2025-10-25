@@ -4,7 +4,7 @@ import os
 use_gpu = os.environ.get('GNUMPY_USE_GPU', 'yes') == 'yes'
 verbose = os.environ.get('VERBOSE', 'no') == 'yes'
 if use_gpu:
-    import gnumpy as gpu
+    from . import gnumpy as gpu
 
 class Stage:
     def __init__(self,

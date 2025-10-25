@@ -2,8 +2,8 @@ from .stage import *
 #use_gpu = os.environ.get('GNUMPY_USE_GPU', 'yes') == 'yes'
 use_gpu = False
 if use_gpu:
-    import gnumpy as gpu
-    import gnumpy as gnp
+    from . import gnumpy as gpu
+    from . import gnumpy as gnp
 
 class SumProduct(Stage):
     def __init__(self, 
