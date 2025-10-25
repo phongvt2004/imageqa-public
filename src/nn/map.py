@@ -2,12 +2,8 @@ from .stage import *
 import os
 use_gpu = os.environ.get('GNUMPY_USE_GPU', 'yes') == 'yes'
 if use_gpu:
-    try:
-        import gnumpy as gpu
-        import gnumpy as gnp
-    except (ImportError, SyntaxError):
-        print('Warning: gnumpy not available or incompatible. Disabling GPU.')
-        use_gpu = False
+    import gnumpy as gpu
+    import gnumpy as gnp
 
 class Map(Stage):
     def __init__(self,
