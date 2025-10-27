@@ -327,7 +327,7 @@ def tile(a, reps):
  a = as_garray(a)
  if len(reps) > a.ndim: a = a._add_axes(len(reps))
  if len(reps) < a.ndim: reps = _extend_shape(reps, a.ndim) # now len(reps)==a.ndim
- retShape = tuple([ a.shape[i] * reps[i] for i in tuple(xrange(len(reps)))])
+ retShape = tuple([ a.shape[i] * reps[i] for i in tuple(range(len(reps)))])
  if _prodT(retShape)==0: return zeros(retShape)
  if _prodT(reps)==1: return a
  for i in range(a.ndim-1): # merge replication requests on adjacent axes, for efficiency.
@@ -392,7 +392,7 @@ def dot(a1, a2):
  if a1.ndim >= 2 and a2.ndim >= 2:
   # this is not necessarily fast, because if a2.ndim>=3 then it involves a transpose
   a12 = ( a1.reshape_2d(-1) if a1.ndim!=2 else a1)
-  a22 = ( a2.transpose((a2.ndim-2,) + tuple(xrange(a2.ndim-2)) + (a2.ndim-1,)).reshape_2d(1)
+  a22 = ( a2.transpose((a2.ndim-2,) + tuple(range(a2.ndim-2)) + (a2.ndim-1,)).reshape_2d(1)
           if a2.ndim!=2 else
           a2)
   retShape = _deleteT2(a1.shape, -1) + _deleteT2(a2.shape, -2)
@@ -442,8 +442,8 @@ def tensordot(a, b, axes=2):
  if type(axes) in _numberTypes: return dot(a.reshape_2d(a.ndim-axes), b.reshape_2d(axes)).reshape(a.shape[:a.ndim-axes] + b.shape[axes:])
  assert len(axes)==2 and len(axes[0])==len(axes[1]), 'the axes parameter to gnumpy.tensordot looks bad'
  aRemove, bRemove = (tuple(axes[0]), tuple(axes[1]))
- return tensordot(a.transpose(filter(lambda x: x not in aRemove, tuple(xrange(a.ndim))) + aRemove),
-                  b.transpose(bRemove + filter(lambda x: x not in bRemove, tuple(xrange(b.ndim)))),
+ return tensordot(a.transpose(filter(lambda x: x not in aRemove, tuple(range(a.ndim))) + aRemove),
+                  b.transpose(bRemove + filter(lambda x: x not in bRemove, tuple(range(b.ndim)))),
                   len(aRemove))
 
  
@@ -625,7 +625,7 @@ class garray(object):
   if self.ndim < other.ndim: return other._broadcastable_op(self, operatorName) # now self.ndim == other.ndim
   selfToBroadcast =  tuple( self.shape[i]==1 and other.shape[i]!=1 for i in range(self.ndim))
   otherToBroadcast = tuple( other.shape[i]==1 and self.shape[i]!=1 for i in range(self.ndim))
-  bc = otherToBroadcast; bci = tuple( i for i in tuple(xrange(len(bc))) if bc[i])
+  bc = otherToBroadcast; bci = tuple( i for i in tuple(range(len(bc))) if bc[i])
   if reduce(operator.or_, selfToBroadcast, False) and reduce(operator.or_, otherToBroadcast, False): return self._broadcastable_op(other._tile_to_broadcast(self.shape, bci), operatorName)
   if reduce(operator.or_, selfToBroadcast, False): return other._broadcastable_op(self, operatorName) # now only other may have dims that need to be broadcast
   if reduce(operator.or_, ( other.shape[i] not in (1, self.shape[i]) for i in range(self.ndim)), False): raise ValueError('shape mismatch: objects cannot be broadcast to a single shape')
@@ -633,7 +633,7 @@ class garray(object):
    if _isTijmen: numTimeIncurred(self.size, 'eltwise binary, no bc')
    return self._new(( _cmType.add if operatorName=='add' else _cmType.mult)(self._base_as_row(), other._base_as_row(), self._new_cm()))
   if self.size==0: return self
-  if bci == tuple(xrange(len(bci))): # handle case: only the first dims need broadcasting
+  if bci == tuple(range(len(bci))): # handle case: only the first dims need broadcasting
    if operatorName in ('multiply', 'add') and _isTijmen and usingGpu(): # using optimized cuda code
     ret = empty(self.shape)
     axis0len = _prodT(self.shape[:len(bci)])
@@ -646,7 +646,7 @@ class garray(object):
     if _isTijmen: numTimeIncurred(self.size, 'eltwise bc axis 0')
     return ret
    #return self._new(( _cmType.add_col_vec if operatorName=='add' else _cmType.mult_by_col)(self._base_shaped(len(bci)), other._base_as_row(), self._new_cm(len(bci))))
-  if bci == tuple(xrange(self.ndim-len(bci), self.ndim)): # handle case: only the last dims need broadcasting
+  if bci == tuple(range(self.ndim-len(bci), self.ndim)): # handle case: only the last dims need broadcasting
    if _isTijmen: numTimeIncurred(self.size, 'eltwise bc axis -1')
    return self._new(( _cmType.add_row_vec if operatorName=='add' else _cmType.mult_by_row)(self._base_shaped(self.ndim-len(bci)), other._base_shaped(self.ndim-len(bci)), self._new_cm(self.ndim-len(bci))))
   # remaining case: broadcasting neither just the first dims nor just the last dims. this can be done very intelligently, but for now I won't bother
@@ -821,9 +821,9 @@ class garray(object):
   """ like numpy.transpose, except that this doesn't return an alias, but rather a new array. """
   # This is not really supported by cudamat, so it takes creativity. I handle a variety of cases differently.
   if len(axes)==1 and not type(axes[0]) in _numberTypes: axes = tuple(axes[0])
-  if axes==_t0: axes = tuple(reversed(tuple(xrange(self.ndim))))
-  if axes == tuple(xrange(self.ndim)): return self.copy()
-  if tuple(sorted(axes)) != tuple(xrange(self.ndim)): raise ValueError("%s is not a valid argument to transpose() of an array of %d axes" % (axes, self.ndim))
+  if axes==_t0: axes = tuple(reversed(tuple(range(self.ndim))))
+  if axes == tuple(range(self.ndim)): return self.copy()
+  if tuple(sorted(axes)) != tuple(range(self.ndim)): raise ValueError("%s is not a valid argument to transpose() of an array of %d axes" % (axes, self.ndim))
   for i in range(self.ndim-1): 
    if axes[i+1]==axes[i]+1: return (self. # see if the task can be simplified by collapsing some axes that are kept adjacent
     reshape(self.shape[:axes[i]] + (_prodT(self.shape[axes[i]:axes[i]+2]),) + self.shape[axes[i]+2:]).
@@ -1067,7 +1067,7 @@ class garray(object):
   return garray(retCm, retShape, None)
 
  def __iter__(self):
-  for i in tuple(xrange(len(self))): yield self[i]
+  for i in tuple(range(len(self))): yield self[i]
  
  def __setitem__(self, selectors, other):
   # this is different from getitem. There, I can handle the axes one at a time. Here, it's more integrated.
@@ -1102,7 +1102,7 @@ class garray(object):
     if _prodT(other.shape[: other.ndim-len(assignedShape)]) != 1: raise ValueError('Incompatible shapes in slice assign: the assigned area has shape %s, and the incoming values have shape %s.' % (assignedShape, other.shape))
     other = other.reshape(other.shape[-len(assignedShape):])
    # now other.ndim == len(assignedShape)
-   if not reduce(operator.and_, ( other.shape[axisNr] in (1, assignedShape[axisNr]) for axisNr in tuple(xrange(len(assignedShape)))), True):
+   if not reduce(operator.and_, ( other.shape[axisNr] in (1, assignedShape[axisNr]) for axisNr in tuple(range(len(assignedShape)))), True):
     raise ValueError('Incompatible shapes in slice assign: the incoming values have shape %s, but the assigned area has shape %s.' % (other.shape, assignedShape))
    other = other._tile_to_broadcast(assignedShape)
   # the only time I can use scalar assign is when I don't need cudamat's column assign at all. that only happens when all selectors other than optionally the first are full slices.
