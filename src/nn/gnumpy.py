@@ -44,6 +44,7 @@ If you really want to know how gnumpy works internally, or if you want to extend
 # ------------------------------------------------------------------------------- module init & shutdown
 
 import numpy, operator, sys as _sys, types as types, time as _time, os as _os, builtins as __builtin__, collections as _collections, pdb as _pdb, gc as _gc, ctypes as _ctypes, weakref as _weakref
+from functools import reduce
 
 _useGpu = _os.environ.get('GNUMPY_USE_GPU', 'auto')
 assert _useGpu in ('auto', 'yes', 'no'), "environment variable GNUMPY_USE_GPU, if present, should be one of 'auto', 'yes', 'no'."
@@ -123,13 +124,13 @@ def _check_number_types(x):
 
 # ------------------------------------------------------------------------------- helpers copied from other files
 
-def _isFullSlice(x): return type(x) == types.SliceType and x == slice(None) # the first check is necessary to avoid returning a broadcast array of False's if x is an array
+def _isFullSlice(x): return isinstance(x, slice) and x == slice(None) # the first check is necessary to avoid returning a broadcast array of False's if x is an array
 def _isSequence(x): return type(x) == list or type(x) == tuple or type(x)==range
 def _insertT(tup, index, tupleToInsert): return tuple(tup[:index]) + tuple(tupleToInsert) + tuple(tup[index:])
 def _modifyT(tup, index, newValue): return tuple(tup[:index]) + (newValue,) + tuple(tup[index+1:])
 def _deleteT(tup, start, end): return tup[:start] + tup[end:]
 def _prodT(x): return reduce(operator.mul, x, 1)
-def _findIndex3(tupOrGenerator): return ( i for i, x in enumerate(tuple(tupOrGenerator)) if x).next()
+def _findIndex3(tupOrGenerator): return next(i for i, x in enumerate(tuple(tupOrGenerator)) if x)
 def _isNumber(x): return type(x) in _numberTypes
 def _nonSeqAsS(x): return ( x if _isSequence(x) else (x,))
 _t0=()
@@ -267,7 +268,7 @@ def memory_available(free_reuse_cache_first):
 def _calling_line():
  """ Internal. Inspects the current python call stack and returns a nice string description of the line of code that called gnumpy. """
  stack = _pdb.traceback.extract_stack()[::-1] # newest first
- stack = stack[( i for i, x in enumerate(stack) if x[0] != stack[0][0]).next():] # skip any gnumpy procs on the stack
+ stack = stack[next(i for i, x in enumerate(stack) if x[0] != stack[0][0]):] # skip any gnumpy procs on the stack
  def stackFrameToString(frame): return 'File "%s", line %d, in function %s:    %s' % (frame[0], frame[1], frame[2], ( '<command unknown>' if frame[3]==None else frame[3]))
  ret = stackFrameToString(stack[0])
  for frame in stack[1:]:
@@ -988,6 +989,10 @@ class garray(object):
  def __rdiv__(self, other): return as_garray(other) / self
  def __rpow__(self, other): raise NotImplementedError('a**b where only b is a garray')
  
+ # Python 3 compatibility: add __truediv__ and __rtruediv__ as aliases
+ __truediv__ = __div__
+ __rtruediv__ = __rdiv__
+ 
  def __pos__(self): return self
  def __neg__(self): return self*-1
  
@@ -995,6 +1000,7 @@ class garray(object):
  def __imul__(self, other): self[_t0] = self*other; return self
  def __isub__(self, other): self[_t0] = self-other; return self
  def __idiv__(self, other): self[_t0] = self/other; return self
+ __itruediv__ = __idiv__  # Python 3 compatibility
  def __imod__(self, other): self[_t0] = self%other; return self
  def __ipow__(self, other, modulo=None): self[_t0] = self.__pow__(other, modulo); return self
 
@@ -1021,12 +1027,12 @@ class garray(object):
   if __builtin__.sum( _isSequence(sel) or is_array(sel) for sel in selectors)>1:
    raise NotImplementedError('slicing with more than one sequence/array among the indices, with also other kinds of values among the indices')
   # handle the operations on different axes one by one; earlier axes are handled earlier
-  axisI = ( i for i, x in enumerate(selectors) if not _isFullSlice(x)).next()
+  axisI = next(i for i, x in enumerate(selectors) if not _isFullSlice(x))
   axisLen = self.shape[axisI]
   axisSelector = selectors[axisI]
   if not _all2_(selectors[axisI+1:], _isFullSlice): return self[selectors[:axisI+1]][(slice(None),)*(axisI+(not type(axisSelector) in _numberTypes)) + selectors[axisI+1:]] # first select on axisI only; then do the further axes.
   # from here, axisI is the only axis on which we don't take a full slice
-  if type(axisSelector) == types.SliceType and axisSelector.step not in (1, None): axisSelector = numpy.arange(axisLen)[axisSelector]
+  if isinstance(axisSelector, slice) and axisSelector.step not in (1, None): axisSelector = numpy.arange(axisLen)[axisSelector]
   if type(axisSelector) in _numberTypes: # selecting a single location on axisI, and thus reducing the dimensionality by 1
    ret = self[selectors[:axisI] + (_short_slice(_read_single_index(axisSelector, axisLen)),)]  .reshape(_deleteT2(self.shape, axisI))
    return ( ret.item() if ret.shape==_t0 else ret) # exception, to have the same behavior as numpy
@@ -1042,7 +1048,7 @@ class garray(object):
     else: return self.transpose_simple(axisI)[axisSelector].transpose_simple(-axisI)
    else: return (concatenate(tuple( self[_modifyT(selectors, axisI, slice(choiceOnThisAxis, choiceOnThisAxis+1))] for choiceOnThisAxis in axisSelector.ravel()), axisI)
                  .reshape(self.shape[:axisI] + axisSelector.shape + self.shape[axisI+1:]))
-  if not type(axisSelector) == types.SliceType: raise ValueError('index not understood: %s' % axisSelector)
+  if not isinstance(axisSelector, slice): raise ValueError('index not understood: %s' % axisSelector)
   # from here, selector is a simple slice
   sFrom, sTo, sLen = _read_simple_slice(axisSelector, axisLen)
   retShape = _modifyT(self.shape, axisI, sLen)
@@ -1083,8 +1089,8 @@ class garray(object):
     self.reshape((_prodT(self.shape[:2]),) + self.shape[2:])[(as_garray(selectors[0])*self.shape[1]+as_garray(selectors[1]),) + selectors[2:]] = as_garray(other)
    return
   if reduce(operator.or_, ( _isSequence(axisSel) or is_array(axisSel) for axisSel in selectors), False): raise NotImplementedError('slice assign with a sequence/array as index, as well as other indexing objects')
-  if reduce(operator.or_, ( type(axisSel) == types.SliceType and axisSel.step not in (1, None) for axisSel in selectors), False): raise NotImplementedError('slice assign with stride != 1')
-  if not reduce(operator.and_, ( type(axisSel) in _numberTypes or type(axisSel) == types.SliceType for axisSel in selectors), True): raise ValueError('index not understood, in slice assignment.')
+  if reduce(operator.or_, ( isinstance(axisSel, slice) and axisSel.step not in (1, None) for axisSel in selectors), False): raise NotImplementedError('slice assign with stride != 1')
+  if not reduce(operator.and_, ( type(axisSel) in _numberTypes or isinstance(axisSel, slice) for axisSel in selectors), True): raise ValueError('index not understood, in slice assignment.')
   selectors = selectors + (slice(None),)*(self.ndim-len(selectors))
   # now len(selectors) == ndim, and all selectors are single indices or simple slices
   # task: broadcast other, and do shape check.
@@ -1115,7 +1121,7 @@ class garray(object):
     other = other.reshape(_insertT(other.shape, i, (1,)))
   if not _isFullSlice(selectors[0]): return self[selectors[0]].__setitem__((slice(None),) + selectors[1:], other)
   # now all selectors are either full or simple slices; axis 0 is a full slice; and at least one other axis is a simple slice.
-  axisI = ( i for i, x in enumerate(tuple( not _isFullSlice(sel) for sel in selectors)) if x).next()
+  axisI = next(i for i, x in enumerate(tuple( not _isFullSlice(sel) for sel in selectors)) if x)
   if _all2_(selectors[axisI+1:], _isFullSlice): # then do a column slice assign directly using cudamat.
    sFrom, sTo = _read_simple_slice(selectors[axisI], self.shape[axisI])[:2]
    elementWidth = _prodT(self.shape[axisI+1:])
