@@ -124,7 +124,7 @@ def _check_number_types(x):
 # ------------------------------------------------------------------------------- helpers copied from other files
 
 def _isFullSlice(x): return type(x) == types.SliceType and x == slice(None) # the first check is necessary to avoid returning a broadcast array of False's if x is an array
-def _isSequence(x): return type(x) == list or type(x) == tuple or type(x)==xrange
+def _isSequence(x): return type(x) == list or type(x) == tuple or type(x)==range
 def _insertT(tup, index, tupleToInsert): return tuple(tup[:index]) + tuple(tupleToInsert) + tuple(tup[index:])
 def _modifyT(tup, index, newValue): return tuple(tup[:index]) + (newValue,) + tuple(tup[index+1:])
 def _deleteT(tup, start, end): return tup[:start] + tup[end:]
